@@ -31,7 +31,7 @@ then
   echo "Add libreoffice repo"
   add_repository "libreoffice"
   sudo apt update
-  sudo apt upgrade
+  sudo apt upgrade -y
 fi
 
 gsettings set org.gnome.mutter edge-tiling false
@@ -62,5 +62,5 @@ then
 
   sudo apt install -y docker-ce docker-ce-cli containerd.io
   sudo usermod -aG docker ${USER}
-  echo "172.17.0.1      host.docker.internal" >> /etc/hosts
+  echo "172.17.0.1      host.docker.internal" | sudo tee -a /etc/hosts > /dev/null 2>&1
 fi

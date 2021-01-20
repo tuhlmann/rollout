@@ -20,3 +20,10 @@ As of now, [download](https://github.com/tuhlmann/rollout/archive/main.zip) the 
 Select one of the playbook files (like `pop_os_2004.sh`), andapt it to your needs and run it.
 
 The playbook files are meant to be idempotent, you should be able to run them multiple times without any additional side effects (like adding a repository multiple times).
+
+```bash
+wget https://github.com/tuhlmann/rollout/archive/main.zip -O rollout-main.zip
+unzip rollout-main.zip
+cd rollout-main
+bash pop_os_2004.sh
+```
