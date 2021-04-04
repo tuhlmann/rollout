@@ -56,3 +56,8 @@ function add_repository {
   printf "ppa:$1 already exists\n"
   return 1
 }
+
+function command_installed {
+  command -v $1 &> /dev/null
+  return $?
+}

@@ -15,7 +15,8 @@ add_packages "build-essential apt-transport-https ca-certificates curl \
      dconf-editor ffmpeg \
      vim vim-gui-common vim-gtk htop python-pycurl language-pack-de \
      ubuntu-restricted-extras ack-grep exuberant-ctags ruby rake \
-     gconf-editor dconf-editor gnupg-agent"
+     gconf-editor dconf-editor gnupg-agent \
+     synaptic gnome-sushi"
 
 #if ! repository_installed "mozillateam/firefox-next"
 #then
@@ -52,6 +53,15 @@ then
   add_packages "variety"
 fi
 
+# Keybase
+if ! package_installed "keybase"
+then
+  curl --remote-name https://prerelease.keybase.io/keybase_amd64.deb
+  sudo apt install -y ./keybase_amd64.deb
+  run_keybase
+  rm ./keybase_amd64.deb
+fi
+
 # Docker
 if ! package_installed "docker-ce"
 then
@@ -64,3 +74,66 @@ then
   sudo usermod -aG docker ${USER}
   echo "172.17.0.1      host.docker.internal" | sudo tee -a /etc/hosts > /dev/null 2>&1
 fi
+
+if ! command_installed "docker_compose"
+then
+  sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+fi
+
+if ! command_installed "java"
+then
+  echo "Install OpenJDK 8.0.265"
+  curl -s "https://get.sdkman.io" | bash
+  source $HOME/.sdkman/bin/sdkman-init.sh
+  sdk install java 8.0.265-open
+fi
+
+if ! command_installed "node"
+then
+  echo "Install NVM and then latest node"
+  wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+  source $HOME/.nvm/nvm.sh
+  nvm install --lts
+fi
+
+if ! package_installed "sublime-text"
+then
+  wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+  echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+  sudo apt update
+  sudo apt install -y sublime-text
+fi
+
+if ! package_installed "darktable"
+then
+  echo 'deb http://download.opensuse.org/repositories/graphics:/darktable/xUbuntu_20.04/ /' | sudo tee /etc/apt/sources.list.d/graphics:darktable.list
+  curl -fsSL https://download.opensuse.org/repositories/graphics:darktable/xUbuntu_20.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/graphics_darktable.gpg > /dev/null
+  sudo apt update
+  sudo apt install -y darktable
+fi
+
+if ! package_installed "pgadmin4-desktop"
+then
+  sudo curl https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo apt-key add
+  sudo sh -c 'echo "deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list'
+  sudo apt update
+  sudo apt install -y pgadmin4-desktop
+fi
+
+# Set clock to local time to play nice with Windows
+timedatectl set-local-rtc 1 --adjust-system-clock
+
+# Set Numpad to be uses as on Windows
+gsettings set org.gnome.desktop.input-sources xkb-options "['caps:none', 'numpad:microsoft']"
+
+# Install flatpak stuff
+flatpak install --noninteractive flathub com.syntevo.SmartGit
+
+flatpak install --noninteractive flathub io.dbeaver.DBeaverCommunity
+
+flatpak install --noninteractive flathub me.hyliu.fluentreader
+
+flatpak install --noninteractive flathub com.github.johnfactotum.Foliate
+
+flatpak install --noninteractive flathub io.typora.Typora
