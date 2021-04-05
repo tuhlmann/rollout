@@ -1,12 +1,14 @@
 #!/bin/bash
 
+# The system user
+THE_USER=$(whoami)
+
 source ./rollout.sh
 
-echo "Installing on POP OS! 20.04"
+echo "Installing on POP OS! 20.04 for user $THE_USER"
 
 echo "Updating current system to latest"
-sudo apt update
-sudo apt upgrade -y
+upgrade_system
 
 echo "Start installing"
 
@@ -31,18 +33,10 @@ if ! repository_installed "libreoffice"
 then
   echo "Add libreoffice repo"
   add_repository "libreoffice"
-  sudo apt update
-  sudo apt upgrade -y
+  upgrade_system
 fi
 
 gsettings set org.gnome.mutter edge-tiling false
-
-# Enable Snaps on Pop OS
-if ! package_installed "snapd"
-then
- add_packages "snapd"
- sudo snap install snap-store
-fi
 
 # Variety Wallpaper Switcher
 if ! package_installed "variety"
@@ -70,23 +64,23 @@ then
   sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
   sudo apt update
 
-  sudo apt install -y docker-ce docker-ce-cli containerd.io
+  add_packages "docker-ce docker-ce-cli containerd.io"
   sudo usermod -aG docker ${USER}
   echo "172.17.0.1      host.docker.internal" | sudo tee -a /etc/hosts > /dev/null 2>&1
 fi
 
-if ! command_installed "docker_compose"
+if ! command_installed "docker-compose"
 then
   sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   sudo chmod +x /usr/local/bin/docker-compose
 fi
 
-if ! command_installed "java"
+if [ ! -d "$HOME/.sdkman" ]
 then
   echo "Install OpenJDK 8.0.265"
   curl -s "https://get.sdkman.io" | bash
   source $HOME/.sdkman/bin/sdkman-init.sh
-  sdk install java 8.0.265-open
+  sdk install java 8.0.282-open
 fi
 
 if ! command_installed "node"
@@ -102,7 +96,7 @@ then
   wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
   echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
   sudo apt update
-  sudo apt install -y sublime-text
+  add_packages "sublime-text"
 fi
 
 if ! package_installed "darktable"
@@ -110,7 +104,15 @@ then
   echo 'deb http://download.opensuse.org/repositories/graphics:/darktable/xUbuntu_20.04/ /' | sudo tee /etc/apt/sources.list.d/graphics:darktable.list
   curl -fsSL https://download.opensuse.org/repositories/graphics:darktable/xUbuntu_20.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/graphics_darktable.gpg > /dev/null
   sudo apt update
-  sudo apt install -y darktable
+  add_packages "darktable"
+fi
+
+if ! package_installed "enpass"
+then
+  wget -O - https://apt.enpass.io/keys/enpass-linux.key | sudo apt-key add -
+  echo 'deb https://apt.enpass.io/ stable main' | sudo tee /etc/apt/sources.list.d/enpass.list
+  sudo apt update
+  add_packages "enpass"  
 fi
 
 if ! package_installed "pgadmin4-desktop"
@@ -118,7 +120,21 @@ then
   sudo curl https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo apt-key add
   sudo sh -c 'echo "deb https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list'
   sudo apt update
-  sudo apt install -y pgadmin4-desktop
+  add_packages "pgadmin4-desktop"
+fi
+
+if ! package_installed "howdy"
+then
+  add_repository "boltgolt/howdy"
+  sudo apt update
+  add_packages howdy v4l-utils
+fi
+
+# Enable Snaps on Pop OS
+if ! package_installed "snapd"
+then
+ add_packages "snapd"
+ sudo snap install snap-store
 fi
 
 # Set clock to local time to play nice with Windows
@@ -127,6 +143,9 @@ timedatectl set-local-rtc 1 --adjust-system-clock
 # Set Numpad to be uses as on Windows
 gsettings set org.gnome.desktop.input-sources xkb-options "['caps:none', 'numpad:microsoft']"
 
+# Lower barrier for low mouse/keyboard battery
+gsettings set org.gnome.settings-daemon.plugins.power percentage-low 4
+
 # Install flatpak stuff
 flatpak install --noninteractive flathub com.syntevo.SmartGit
 
@@ -134,6 +153,33 @@ flatpak install --noninteractive flathub io.dbeaver.DBeaverCommunity
 
 flatpak install --noninteractive flathub me.hyliu.fluentreader
 
+flatpak install --noninteractive flathub com.gitlab.newsflash
+
 flatpak install --noninteractive flathub com.github.johnfactotum.Foliate
 
 flatpak install --noninteractive flathub io.typora.Typora
+
+flatpak install --noninteractive flathub com.slack.Slack
+
+flatpak install --noninteractive flathub com.todoist.Todoist
+
+flatpak install --noninteractive flathub org.filezillaproject.Filezilla
+
+flatpak install --noninteractive flathub org.videolan.VLC
+
+flatpak install --noninteractive flathub com.spotify.Client
+
+# TODO Snap Store stuff, only successful after relogin/reboot
+sudo snap install shutter
+sudo snap install nodemailerapp
+
+# Setup /ewu dir
+if [ ! -d "/ewu" ]
+then
+  sudo mkdir /ewu
+  sudo chown $THE_USER.$THE_USER /ewu
+fi
+
+# Disable printer auto discovery
+sudo systemctl stop cups-browsed
+sudo systemctl disable cups-browsed
