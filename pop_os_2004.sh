@@ -163,15 +163,20 @@ flatpak install --noninteractive flathub com.slack.Slack
 
 flatpak install --noninteractive flathub com.todoist.Todoist
 
+flatpak install --noninteractive flathub net.cozic.joplin_desktop
+
 flatpak install --noninteractive flathub org.filezillaproject.Filezilla
 
 flatpak install --noninteractive flathub org.videolan.VLC
 
 flatpak install --noninteractive flathub com.spotify.Client
 
+flatpak install --noninteractive flathub org.gimp.GIMP
+
 # TODO Snap Store stuff, only successful after relogin/reboot
 sudo snap install shutter
 sudo snap install nodemailerapp
+sudo snap install p3x-onenote
 
 # Setup /ewu dir
 if [ ! -d "/ewu" ]
