@@ -5,7 +5,7 @@ THE_USER=$(whoami)
 
 source ./rollout.sh
 
-echo "Installing on POP OS! 20.04 for user $THE_USER"
+echo "Installing on Ubuntu 20.04 for user $THE_USER"
 
 echo "Updating current system to latest"
 upgrade_system
