@@ -146,8 +146,6 @@ flatpak install --noninteractive flathub io.typora.Typora
 
 flatpak install --noninteractive flathub com.slack.Slack
 
-flatpak install --noninteractive flathub com.todoist.Todoist
-
 flatpak install --noninteractive flathub net.cozic.joplin_desktop
 
 flatpak install --noninteractive flathub org.filezillaproject.Filezilla
