@@ -17,18 +17,9 @@ add_packages "build-essential apt-transport-https ca-certificates curl \
      dconf-editor ffmpeg \
      vim vim-gui-common vim-gtk htop language-pack-de \
      ubuntu-restricted-extras ack-grep exuberant-ctags ruby rake \
-     gnupg-agent variety"
+     gnupg-agent variety gnome-sushi restic"
 
 gsettings set org.gnome.mutter edge-tiling false
-
-# Variety Wallpaper Switcher
-#if ! package_installed "variety"
-#then
-#  echo "Install variety slideshow"
-#  add_repository "peterlevi/ppa"
-#  sudo apt update
-#  add_packages "variety"
-#fi
 
 # Keybase
 if ! package_installed "keybase"
@@ -67,6 +58,16 @@ then
   source $HOME/.sdkman/bin/sdkman-init.sh
   sdk install java 11.0.11-open
   sdk install maven 3.8.1
+fi
+
+if ! package_installed "syncthing"
+then
+  echo "Install Syncthing"
+  sudo curl -s -o /usr/share/keyrings/syncthing-archive-keyring.gpg https://syncthing.net/release-key.gpg
+  echo "deb [signed-by=/usr/share/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable" | sudo tee /etc/apt/sources.list.d/syncthing.list
+  printf "Package: *\nPin: origin apt.syncthing.net\nPin-Priority: 990\n" | sudo tee /etc/apt/preferences.d/syncthing
+  sudo apt update
+  add_packages "syncthing"
 fi
 
 if ! command_installed "node"
@@ -156,12 +157,14 @@ flatpak install --noninteractive flathub com.spotify.Client
 
 flatpak install --noninteractive flathub org.gimp.GIMP
 
+flatpak install --noninteractive flathub org.kde.gwenview
+
 # TODO Snap Store stuff, only successful after relogin/reboot
 sudo snap install snap-store
 sudo snap install shutter
 sudo snap install nodemailerapp
 sudo snap install p3x-onenote
-sudo snap install superproductivity
+# sudo snap install superproductivity
 sudo snap install vokoscreen-ng
 
 # Setup /ewu dir
