@@ -32,7 +32,7 @@ fi
 
 if ! command_installed "docker-compose"
 then
-  sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo curl -L "https://github.com/docker/compose/releases/download/2.3.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   sudo chmod +x /usr/local/bin/docker-compose
 fi
 
@@ -47,7 +47,7 @@ fi
 if ! command_installed "node"
 then
   echo "Install NVM and then latest node"
-  wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+  wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
   source $HOME/.nvm/nvm.sh
   nvm install --lts
 fi
